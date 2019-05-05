@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Arboles de Decisión</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="Recursos/bootstrap-4.3.1-dist/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="Recursos/css/style.css" rel="stylesheet" type="text/css"/>
+        <script src="Recursos/bootstrap-4.3.1-dist/js/bootstrap.js" type="text/javascript"></script>
+        <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
+        <script src="js/functions.js" type="text/javascript"></script>
+    </head>
+    <body>
+
+
+        <section>
+            <div class="contenedor_prin">
+                <h1>Cargar archivo</h1>        
+                <form method="post" id="formulario"             action="./servicios/servicios-Web/consumir"  enctype="multipart/form-data">
+                    <label for="inputFile">Seleccionar archivo</label>
+                    <input id="file" class="btn btn-light" data-action="./servicios/servicios-Web/informacion" type="file" name="file" accept=".csv, .arff" required/>
+                    <div class="col-md-5 row">
+                        <select id="algoritmo" name="algoritmo" class="form-control">
+                            <option value="1">RJ48</option>
+                        </select>
+
+                        <button id="btnform-mineria" type="submit" class="btn btn-primary btn_pos">Iniciar proceso</button>
+
+                    </div><br>
+
+                </form> 
+                <div id="rta" class="resultado"><br></div>
+            </div>
+        </section>
+
+        <footer>
+            <center> 
+                <div class="card">
+                    <div class="card-header">
+                        Arboles de Decisiones - desarrollados por:
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Julian Camilo - Laura Vanessa - Daniela Rojas</h5>
+                        <p class="card-text">Inteligencia de Negocios III</p>
+                    </div>
+                </div>
+            </center>        
+
+        </footer>
+
+    </body>
+
+</html>
