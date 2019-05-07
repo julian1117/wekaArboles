@@ -10,6 +10,7 @@ import weka.associations.Apriori;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
+import weka.classifiers.trees.RandomTree;
 import weka.core.Instances;
 
 /**
@@ -83,33 +84,95 @@ public class ArbolesDecisionMineria implements Serializable {
     public String RandomForest(Instances data) {
         try {
             
-            //Creamos el objeto arbol rrf
-            RandomForest rf = new RandomForest();
-            //clasificador de rf
+            Gson gson = new Gson();
+            JsonArboles jArbol = new JsonArboles();
+            //Creamos el objeto arbol rj48
+            RandomForest rF = new RandomForest();
+            //clasificador de j48
 
-            rf.buildClassifier(data);
+            rF.buildClassifier(data);
             //Objeto para validacion modelo con red bayesiana
 
-            Evaluation evalRf = new Evaluation(data);
+            Evaluation evalJ48 = new Evaluation(data);
 
-            evalRf.crossValidateModel(rf, data, 10, new Random(1));
+            evalJ48.crossValidateModel(rF, data, 10, new Random(1));
 
-            String resBay = "<b><center>Resultados RRf</center>"
+            String resBay = "<b><center>Resultados RJ48</center>"
                     + "<br>=======</br>"
                     + "Modelo generado indica los siguientes resultados: "
                     + "<br>=======</br>";
             //obtener resulados
-            resBay = resBay + ("<b>1. numero de instancias clasificadas:<b>" + (int) evalRf.numInstances() + "<br>");
-            resBay = resBay + ("<b>2. porcentaje de instancias correctamente clasificadas:</b>" + format.format(evalRf.pctCorrect()) + "<br>");
-            resBay = resBay + ("<b>3. numero de instancias correctamente clasificadas:</b>" + (int) evalRf.correct() + "<br>");
-            resBay = resBay + ("<b>4. porcentaje de instancias incorrectamente clasificadas:</b>" + format.format(evalRf.pctIncorrect()) + "<br>");
-            resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b>" + (int) evalRf.incorrect() + "<br>");
-            resBay = resBay + ("<b>6. Media del error absoluto:</b>" + format.format(evalRf.meanAbsoluteError()) + "<br>");
-            resBay = resBay + ("<b>7." + evalRf.toMatrixString("Matriz de confucion").replace("\n", "<br>"));          
-           
+            resBay = resBay + ("<b>1. numero de instancias clasificadas:<b>" + (int) evalJ48.numInstances() + "<br>");
+            resBay = resBay + ("<b>2. porcentaje de instancias correctamente clasificadas:</b>" + format.format(evalJ48.pctCorrect()) + "<br>");
+            resBay = resBay + ("<b>3. numero de instancias correctamente clasificadas:</b>" + (int) evalJ48.correct() + "<br>");
+            resBay = resBay + ("<b>4. porcentaje de instancias incorrectamente clasificadas:</b>" + format.format(evalJ48.pctIncorrect()) + "<br>");
+            resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b>" + (int) evalJ48.incorrect() + "<br>");
+            resBay = resBay + ("<b>6. Media del error absoluto:</b>" + format.format(evalJ48.meanAbsoluteError()) + "<br>");
+            resBay = resBay + ("<b>7." + evalJ48.toMatrixString("Matriz de confucion").replace("\n", "<br>"));            
             
-            return resBay;
+            jArbol.setNumeroInstancias((int)evalJ48.numInstances());
+            jArbol.setInstanciasCorrectas(format.format(evalJ48.pctCorrect()));
+            jArbol.setNumeroInstanciasCorrectas((int) evalJ48.correct());
+            jArbol.setPorcentInstanciasCorrectas(format.format(evalJ48.pctIncorrect()));//incorrectas
+            jArbol.setNumeroInstanciasIncorrectas((int) evalJ48.incorrect());
+            //jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError()));
+            jArbol.setArbol(evalJ48.toCumulativeMarginDistributionString());
             
+            String JSON = gson.toJson(jArbol);
+            
+            return resBay+"\n"+JSON;
+        } catch (Exception ex) {
+            return "El error es: " + ex.getMessage();
+        }
+    }
+    
+     /**
+     * Algoritmo de weka Arbol RJ48
+     *
+     *
+     * @param data conjunto de datos
+     * @return el resultado del analisis del arbol RJ48
+     */
+    public String RandomTree(Instances data) {
+        try {
+            
+            Gson gson = new Gson();
+            JsonArboles jArbol = new JsonArboles();
+            //Creamos el objeto arbol rj48
+            RandomTree rTree = new RandomTree();
+            //clasificador de j48
+
+            rTree.buildClassifier(data);
+            //Objeto para validacion modelo con red bayesiana
+
+            Evaluation evalJ48 = new Evaluation(data);
+
+            evalJ48.crossValidateModel(rTree, data, 10, new Random(1));
+
+            String resBay = "<b><center>Resultados RANDOMTREE</center>"
+                    + "<br>=======</br>"
+                    + "Modelo generado indica los siguientes resultados: "
+                    + "<br>=======</br>";
+            //obtener resulados
+            resBay = resBay + ("<b>1. numero de instancias clasificadas:<b>" + (int) evalJ48.numInstances() + "<br>");
+            resBay = resBay + ("<b>2. porcentaje de instancias correctamente clasificadas:</b>" + format.format(evalJ48.pctCorrect()) + "<br>");
+            resBay = resBay + ("<b>3. numero de instancias correctamente clasificadas:</b>" + (int) evalJ48.correct() + "<br>");
+            resBay = resBay + ("<b>4. porcentaje de instancias incorrectamente clasificadas:</b>" + format.format(evalJ48.pctIncorrect()) + "<br>");
+            resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b>" + (int) evalJ48.incorrect() + "<br>");
+            resBay = resBay + ("<b>6. Media del error absoluto:</b>" + format.format(evalJ48.meanAbsoluteError()) + "<br>");
+            resBay = resBay + ("<b>7." + evalJ48.toMatrixString("Matriz de confucion").replace("\n", "<br>"));            
+            
+            jArbol.setNumeroInstancias((int)evalJ48.numInstances());
+            jArbol.setInstanciasCorrectas(format.format(evalJ48.pctCorrect()));
+            jArbol.setNumeroInstanciasCorrectas((int) evalJ48.correct());
+            jArbol.setPorcentInstanciasCorrectas(format.format(evalJ48.pctIncorrect()));//incorrectas
+            jArbol.setNumeroInstanciasIncorrectas((int) evalJ48.incorrect());
+            //jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError()));
+            jArbol.setArbol(evalJ48.toCumulativeMarginDistributionString());
+            
+            String JSON = gson.toJson(jArbol);
+            
+            return resBay+"\n"+JSON;
         } catch (Exception ex) {
             return "El error es: " + ex.getMessage();
         }
