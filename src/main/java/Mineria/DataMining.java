@@ -48,6 +48,10 @@ public class DataMining implements Serializable {
                     // Ejecuta el algoritmo de randomforest
                     resultado = raDataMining.RandomForest(data);
                     break;
+                    
+                case 3:
+                    //Ejecuta el algoritmo RandomTree
+                    resultado = raDataMining.RandomTree(data);
                 default:
             }
             return encabezado(data) + "\n" + resultado;
