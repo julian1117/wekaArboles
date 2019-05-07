@@ -11,18 +11,20 @@ import weka.core.Instances;
  *
  * @author CAMILO
  */
-public class DataMining implements Serializable{
-    
+public class DataMining implements Serializable {
+
     // Algoritmos de Reglas de Asociacion
     ArbolesDecisionMineria raDataMining = new ArbolesDecisionMineria();
-    
+
     /**
      * Aplica la mineria de datos para el algoritmo especifico
+     *
      * @param datos conjunto de datos a analizar
-     * @param tipoAlgoritmo el tipo de algoritmo a ejecutar para el conjunto de datos
-     * @return 
+     * @param tipoAlgoritmo el tipo de algoritmo a ejecutar para el conjunto de
+     * datos
+     * @return
      */
-    public String mineria (String datos, int tipoAlgoritmo){
+    public String mineria(String datos, int tipoAlgoritmo) {
         StringReader sr = new StringReader(datos);
         BufferedReader br = new BufferedReader(sr);
         try {
@@ -36,44 +38,51 @@ public class DataMining implements Serializable{
             br.close();
             String resultado = "";
             //Obtenemos resultados dependiendo del algoritmo
-            switch (tipoAlgoritmo){
+            switch (tipoAlgoritmo) {
                 case 1:
                     // Ejecuta el algoritmo de apriori
                     resultado = raDataMining.arbolRJ48(data);
                     break;
+
+                case 2:
+                    // Ejecuta el algoritmo de randomforest
+                    resultado = raDataMining.RandomForest(data);
+                    break;
                 default:
             }
-            return encabezado(data)+"\n"+resultado;
+            return encabezado(data) + "\n" + resultado;
         } catch (IOException ex) {
             return "El error es: " + ex.getMessage();
         }
     }
-    
+
     /**
      * define el encabezado de un conjunto de datos
+     *
      * @param data los datos con las isntancias
      * @return el encabezado del conjunto de datos
      */
-    public String encabezado(Instances data){
-        String descripcion = "<b>Atributo clase:</b> "+data.attribute(data.numAttributes()-1).name()+"<br>";
+    public String encabezado(Instances data) {
+        String descripcion = "<b>Atributo clase:</b> " + data.attribute(data.numAttributes() - 1).name() + "<br>";
         descripcion += "<b>Posibles valores:</b><ul align='left'>";
-        for (int z = 0; z < data.attribute(data.numAttributes()-1).numValues(); z++) {
-            descripcion += "<li>"+data.attribute(data.numAttributes()-1).value(z)+"</li>";
+        for (int z = 0; z < data.attribute(data.numAttributes() - 1).numValues(); z++) {
+            descripcion += "<li>" + data.attribute(data.numAttributes() - 1).value(z) + "</li>";
         }
-        return descripcion+"</ul>";
+        return descripcion + "</ul>";
     }
-    
+
     /**
      * Saca la informacion del archivo y la guarda como texto
+     *
      * @param file el archivo a extraerle la informacion
      * @return toda la informacion del archivo en una variable string
-     * @throws IOException 
+     * @throws IOException
      */
-    public String convertir (BufferedReader file) throws IOException{
+    public String convertir(BufferedReader file) throws IOException {
         String temp;
-        String cadena="";
-        while ((temp = file.readLine()) != null){
-            cadena = cadena+temp+ "\n";
+        String cadena = "";
+        while ((temp = file.readLine()) != null) {
+            cadena = cadena + temp + "\n";
         }
         return cadena;
     }

@@ -15,12 +15,13 @@
         <section>
             <div class="contenedor_prin">
                 <h1>Cargar archivo</h1>        
-                <form method="post" id="formulario"             action="./servicios/servicios-Web/consumir"  enctype="multipart/form-data">
+                <form method="post" id="formulario" action="./servicios/servicios-Web/consumir"  enctype="multipart/form-data">
                     <label for="inputFile">Seleccionar archivo</label>
                     <input id="file" class="btn btn-light" data-action="./servicios/servicios-Web/informacion" type="file" name="file" accept=".csv, .arff" required/>
                     <div class="col-md-5 row">
                         <select id="algoritmo" name="algoritmo" class="form-control">
                             <option value="1">RJ48</option>
+                            <option value="1">RandomForest</option>
                         </select>
 
                         <button id="btnform-mineria" type="submit" class="btn btn-primary btn_pos">Iniciar proceso</button>
