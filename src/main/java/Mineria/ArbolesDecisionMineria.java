@@ -43,7 +43,8 @@ public class ArbolesDecisionMineria implements Serializable {
             Evaluation evalJ48 = new Evaluation(data);
 
             evalJ48.crossValidateModel(j48, data, 10, new Random(1));
-
+            System.out.println(j48.graph());
+            String arbol = j48.graph();
             String resBay = "<b><center>Resultados RJ48</center>"
                     + "<br>=======</br>"
                     + "Modelo generado indica los siguientes resultados: "
@@ -56,14 +57,14 @@ public class ArbolesDecisionMineria implements Serializable {
             resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b>" + (int) evalJ48.incorrect() + "<br>");
             resBay = resBay + ("<b>6. Media del error absoluto:</b>" + format.format(evalJ48.meanAbsoluteError()) + "<br>");
             resBay = resBay + ("<b>7." + evalJ48.toMatrixString("Matriz de confucion").replace("\n", "<br>"));            
-            
+            resBay = resBay + ("<b>8." +arbol + "<br>");  
             jArbol.setNumeroInstancias((int)evalJ48.numInstances());
             jArbol.setInstanciasCorrectas(format.format(evalJ48.pctCorrect()));
             jArbol.setNumeroInstanciasCorrectas((int) evalJ48.correct());
             jArbol.setPorcentInstanciasCorrectas(format.format(evalJ48.pctIncorrect()));//incorrectas
             jArbol.setNumeroInstanciasIncorrectas((int) evalJ48.incorrect());
             //jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError()));
-            jArbol.setArbol(evalJ48.toCumulativeMarginDistributionString());
+            //jArbol.setArbol(arbol);
             
             String JSON = gson.toJson(jArbol);
             
