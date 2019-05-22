@@ -16,10 +16,11 @@ section {
     text-align: center;
 }
 .resultado {
+    width: 100%;
     border: 1px solid #ccc;
     background: white;
     padding: 20px;
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 5px 5px;
 }
 .lds-ring {
     display: inline-block;
@@ -55,4 +56,9 @@ section {
     100% {
         transform: rotate(360deg);
     }
+}
+
+.fondoOscuro{
+    background: #181a1b;
+    color: ghostwhite;
 }
