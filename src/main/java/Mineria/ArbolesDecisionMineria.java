@@ -6,11 +6,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javax.json.Json;
-import modelo.Hijo;
 import modelo.JsonArboles;
-import modelo.Padre;
-import weka.associations.Apriori;
+import modelo.Nodo;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.classifiers.trees.RandomForest;
@@ -23,13 +20,17 @@ import weka.core.Instances;
  */
 public class ArbolesDecisionMineria implements Serializable {
 
-    String[][] nombreDatos;
+    //Lista para guardar la informacion del arbol y el JSON para D3.JS
+    private ArrayList<String> listaRetorno = new ArrayList<>();
 
     // definimos el formato para los deciales
     DecimalFormat format = new DecimalFormat("#.##");
 
     //Libreria Gson
     Gson gson = new Gson();
+
+    // instanciamos el data mining
+    private DataMining dataMining;
 
     /**
      * Algoritmo de weka Arbol RJ48
@@ -39,35 +40,33 @@ public class ArbolesDecisionMineria implements Serializable {
      * @return el resultado del analisis del arbol RJ48
      */
     public String arbolRJ48(Instances data) {
+        this.dataMining = new DataMining();
         try {
 
             JsonArboles jArbol = new JsonArboles();
             //Creamos el objeto arbol rj48
             J48 j48 = new J48();
             //clasificador de j48
-
             j48.buildClassifier(data);
             //Objeto para validacion modelo con red bayesiana
-
             Evaluation evalJ48 = new Evaluation(data);
-
             evalJ48.crossValidateModel(j48, data, 10, new Random(1));
-            //System.out.println(j48.graph());
-            String[] arbol = j48.graph().split("\n");
+            //Obtenemos el grafico del arbol generado por weka
+            String arbol = j48.graph();
 
             String resBay = "<b><center>Resultados RJ48</center>"
                     + "<br>=======</br>"
                     + "Modelo generado indica los siguientes resultados: "
                     + "<br>=======</br>";
             //obtener resulados
-            resBay = resBay + ("<b>1. numero de instancias clasificadas:<b>" + (int) evalJ48.numInstances() + "<br>");
-            resBay = resBay + ("<b>2. porcentaje de instancias correctamente clasificadas:</b>" + format.format(evalJ48.pctCorrect()) + "<br>");
-            resBay = resBay + ("<b>3. numero de instancias correctamente clasificadas:</b>" + (int) evalJ48.correct() + "<br>");
-            resBay = resBay + ("<b>4. porcentaje de instancias incorrectamente clasificadas:</b>" + format.format(evalJ48.pctIncorrect()) + "<br>");
-            resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b>" + (int) evalJ48.incorrect() + "<br>");
-            resBay = resBay + ("<b>6. Media del error absoluto:</b>" + format.format(evalJ48.meanAbsoluteError()) + "<br>");
-            resBay = resBay + ("<b>7." + evalJ48.toMatrixString("Matriz de confucion").replace("\n", "<br>"));
-            resBay = resBay + ("<b>8." + arbol + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">1. numero de instancias clasificadas: </span>" + (int) evalJ48.numInstances() + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">2. porcentaje de instancias correctamente clasificadas: </span>" + format.format(evalJ48.pctCorrect()) + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">3. numero de instancias correctamente clasificadas: </span>" + (int) evalJ48.correct() + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">4. porcentaje de instancias incorrectamente clasificadas: </span>" + format.format(evalJ48.pctIncorrect()) + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">5. Numero de instancias incorrectamente clasificadas: </span>" + (int) evalJ48.incorrect() + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">6. Media del error absoluto: </span>" + format.format(evalJ48.meanAbsoluteError()) + "<br>");
+            resBay = resBay + ("<span class=\"text-success\">7." + evalJ48.toMatrixString("Matriz de confucion </span>").replace("\n", "<br>"));
+
             jArbol.setNumeroInstancias((int) evalJ48.numInstances());
             jArbol.setInstanciasCorrectas(format.format(evalJ48.pctCorrect()));
             jArbol.setNumeroInstanciasCorrectas((int) evalJ48.correct());
@@ -76,11 +75,13 @@ public class ArbolesDecisionMineria implements Serializable {
             //jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError()));
             //jArbol.setArbol(arbol);
 
-            //String JSON = gson.toJson(jArbol);
             String resPu = transformacionJ48JSON(arbol);
 
-            //return resBay+"\n >>>>>"+res;
-            return resPu;
+            listaRetorno.add(this.dataMining.encabezado(data) + "\n" + resBay + "<span class='text-success'><br>Objeto JSON:</span><br>" + resPu);
+            listaRetorno.add(resPu);
+
+            return gson.toJson(listaRetorno);
+
         } catch (Exception ex) {
             // ex.printStackTrace();
             return "El error en RJ48 es: " + ex.getMessage();
@@ -95,6 +96,7 @@ public class ArbolesDecisionMineria implements Serializable {
      * @return el resultado del analisis del arbol RJ48
      */
     public String RandomForest(Instances data) {
+        this.dataMining = new DataMining();
         try {
             //lala
             Gson gson = new Gson();
@@ -109,6 +111,7 @@ public class ArbolesDecisionMineria implements Serializable {
             Evaluation evalJ48 = new Evaluation(data);
 
             evalJ48.crossValidateModel(rF, data, 10, new Random(1));
+
 
             String resBay = "<b><center>Resultados Forest</center>"
                     + "<br>=======</br>"
@@ -131,8 +134,16 @@ public class ArbolesDecisionMineria implements Serializable {
             // jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError("Matriz de confucion").replace("\n", "<br>")));
 
             String JSON = gson.toJson(jArbol);
+            
+            System.out.println(arbol);
+            String resPu = transformacionJ48JSON(arbol);
 
-            return resBay + "\n" + JSON;
+            listaRetorno.add(this.dataMining.encabezado(data) + "\n" + resBay + "<span class='text-success'><br>Objeto JSON:</span><br>" + resPu);
+            listaRetorno.add(resPu);
+
+            //return resBay + "\n" + JSON;
+            return gson.toJson(listaRetorno);
+
         } catch (Exception ex) {
             return "El error es: " + ex.getMessage();
         }
@@ -143,12 +154,12 @@ public class ArbolesDecisionMineria implements Serializable {
      *
      *
      * @param data conjunto de datos
-     * @return el resultado del analisis del arbol RJ48
+     * @return el resultado del analisis del arbol rabdomtree
      */
     public String RandomTree(Instances data) {
+        this.dataMining = new DataMining();
         try {
 
-            Gson gson = new Gson();
             JsonArboles jArbol = new JsonArboles();
             //Creamos el objeto arbol rj48
             RandomTree rTree = new RandomTree();
@@ -160,6 +171,9 @@ public class ArbolesDecisionMineria implements Serializable {
             Evaluation evalJ48 = new Evaluation(data);
 
             evalJ48.crossValidateModel(rTree, data, 10, new Random(1));
+
+            //Obtenemos el grafico del arbol generado por weka
+            String arbol = rTree.graph();
 
             String resBay = "<b><center>Resultados RANDOMTREE</center>"
                     + "<br>=======</br>"
@@ -182,173 +196,110 @@ public class ArbolesDecisionMineria implements Serializable {
             //jArbol.setMediaError(format.format(evalJ48.meanAbsoluteError()));
             jArbol.setArbol(evalJ48.toCumulativeMarginDistributionString());
 
-            String JSON = gson.toJson(jArbol);
+            //String JSON = gson.toJson(jArbol);
+            String resPu = transformacionJ48JSON(arbol);
+            System.out.println(resPu);            
+s
+            listaRetorno.add(this.dataMining.encabezado(data) + "\n" + resBay + "<span class='text-success'><br>Objeto JSON:</span><br>" + resPu);
+            listaRetorno.add(resPu);
 
-            return resBay + "\n" + JSON;
+            return resPu;
+            //return resBay + "\n" + JSON;
         } catch (Exception ex) {
             return "El error es: " + ex.getMessage();
         }
     }
 
-//    public String transformacionJ48JSON(String[] data) {
-//        Padre arbol = new Padre();
-//        Padre nodo = new Padre();
-//        for (int i = 0; i < data.length - 1; i++) {
-//            //Se verifica que sea hijo
-//            if (i % 2 == 0) {
-//                nodo.setParent(data[i].substring(0, Math.min(2, data[i].length())));
-//                nodo.setName(data[i].substring(4, Math.min(6, data[i].length())));
-//                //objPadre.setHijo(objHijo);
-//            }
-//            hijo[i] = nodo;
-//        }
-//        return gson.toJson(hijo);
-//    }
     /**
+     * Metodo para obtener el JSON que se enviara al arbol d3.js
      *
+     * @param dataGr grafico en formato string que retorna el arbol
+     * @return JSON que se enviara a d3.js
      */
-    public String transformacionJ48JSON(String[] data) {
-        List<Padre> arbol = new ArrayList<>();
-        List<Hijo> hijo = new ArrayList<>();
-        String aux = "";
+    public String transformacionJ48JSON(String dataGr) {
+        String[] data = dataGr.split("->");
+        List<Nodo> listNodo = new ArrayList<>();
+        String padre = "";
 
         for (int i = 0; i < data.length; i++) {
-            //Se verifica que sea hijo
-            //if (i % 2 == 0 ) {
-            //HijoS
-            boolean palabraSplit = data[i].matches(".*->.*");
-            if (palabraSplit) {
-                // System.out.println("Entra si es ->");
-                String[] hijos = data[i].split("->");
-            
-                //Padres
-                String[] padre = hijos[1].split(" ");
-                
+            int tamanoCadena = data[i].length();
+            Nodo objNodo = null;
+            String hijo = "";
 
-                Hijo objHijo = new Hijo();
-
-                objHijo.setParent(hijos[0]);
-                objHijo.setName(padre[0]);
-                hijo.add(objHijo);
-            } else {
-                // System.out.println(data[i]);
+            //Creamo el nodo padre principal del arbol
+            if (i == 0) {
+                padre = data[i].substring(tamanoCadena - 2);
+                objNodo = new Nodo(padre);
             }
-            // }
-            //System.out.println("termina if ");
-
-        }
-
-        //For para padres y sus hijos
-        //Recorre arreglo principal
-        //System.out.println("antes for j");
-        for (int j = 0; j < data.length; j++) {
-           // System.out.println("Entra for j");
-
-            //objeto padre
-            Padre objPadre = new Padre();
-            objPadre.setParent("null");
-            //System.out.println("Crea padre");
-
-            // los hijos que contiene el padre
-            List<Padre> children = new ArrayList<>();
-
-            //recorre unicamente arreglo de hijos
-            for (int l = 0; l < hijo.size(); l++) {
-                boolean palabraSplit = data[j].matches(".*->.*");
-                if (palabraSplit) {
-                    String[] hijos = data[j].split("->");
-                    String[] padre = hijos[1].split(" ");
-                    String pad = padre[0];
-                    System.out.println("padre " + pad + " - " + hijo.get(l).getParent());
-
-                    if (pad.equals(hijo.get(l).getParent())) {
-                        // Agregamos el nombre del objeto padre
-                        objPadre.setName(hijo.get(l).getParent());
-                        // Sera hijo del objeto padre
-                        Padre h = new Padre();
-                        h.setName(hijo.get(l).getName());
-                        h.setParent(hijo.get(l).getParent());
-                        //validamos si es padre
-                        if (this.isPadre(h.getName(), hijo)) {
-                            //como es padre, buscamos sus hijos
-                            h.setChildren(this.getChildrens(h.getName(), hijo));
-                        }
-                        // Agregamos el hijo a la lista de hijos del padre
-                        children.add(h);
-                    }
+            //Accedemos al los nodos hijos
+            if (i > 0) {
+                int numLong = 2;
+                if (i >= 10 && i < 99) {
+                    numLong = 3;
+                } else if (i >= 100 && i < 999) {
+                    numLong = 4;
+                } else if (i >= 1000 && i < 9999) {
+                    numLong = 5;
+                } else if (i >= 10000 && i < 99999) {
+                    numLong = 6;
+                } else if (i >= 100000 && i < 999999) {
+                    numLong = 7;
+                } else if (i >= 1000000 && i < 9999999) {
+                    numLong = 8;
+                } else if (i >= 10000000 && i < 99999999) {
+                    numLong = 9;
                 }
+                hijo = data[i].substring(0, numLong);
+                objNodo = new Nodo(hijo);
+                Nodo padreNodo = obtenerPadre(padre, listNodo);
+                padreNodo.getChildren().add(objNodo);
             }
+            String nombre = nombreNodo(data[i]);
+            objNodo.setName(nombre);
+            listNodo.add(objNodo);
+            objNodo.setChildren(new ArrayList<Nodo>());
 
-            if (objPadre.getName() != null) {
-                // Agregamos el objeto solo si no se ha agregado anteriormente
-                if (!aux.equals(objPadre.getName())) {
-                    objPadre.setChildren(children);
-                    arbol.add(objPadre);
-                    // agregamos el nombre a la variable auxiliar
-                    aux = objPadre.getName();
-                    break;
-                }
+            padre = data[i].substring(tamanoCadena - 2);
+            if (!padre.contains("N")) {
+                padre = "N" + padre;
             }
         }
-        return gson.toJson(arbol);
+        return gson.toJson(listNodo.get(0));
     }
 
     /**
-     * verifica si un nodo es padre
+     * Metodo que permite obtener el nombre del nodo
      *
-     * @param name el nombre del nodo a verificar
-     * @param hijo la lista de hijos
-     * @return true si es padre, de lo contrario false
+     * @param data objeto del que obtendremos el peso y nombre
+     * @return Peso y Nombre del nodo
      */
-    public boolean isPadre(String name, List<Hijo> hijos) {
-        for (int i = 1; i < hijos.size() - 1; i++) {
-            if (hijos.get(i).getParent().equals(name)) {
-                return true;
-            }
+    private String nombreNodo(String data) {
+        //Hacemos split por cada " 
+        String nombreNodo[] = data.split("\"");
+        //Obtenemos el valor del peso del nodo
+        String nombre = "";
+        //Validamos que el arreglo contenga el resto del nombre para poder concatenarlo al peso que ya se obtubo
+        if (nombreNodo.length > 3) {
+            return nombre = nombreNodo[1] + " - " + nombreNodo[3];
+        } else {
+            return null;
         }
-        return false;
     }
 
     /**
-     * Obtiene los hijos de el nodo padre del arbol
+     * Metodo para obtiener el nodo padre de una clase hija
      *
-     * @param padre es el nombre del primer nodo del arbol
-     * @param hijos es la lista de hijos del arbol
-     * @return la lista ordenada de hijos del padre del
+     * @param nombrePadre nombre del nodo padre que se desea obtener
+     * @param nodos lista de nodos donde se desea buscar
+     * @return el nodo padre
      */
-    public List<Padre> getChildrens(String padre, List<Hijo> hijos) {
-        List<Padre> childrens = new ArrayList<>();
-        for (int i = 1; i < hijos.size(); i++) {
-            Padre h = new Padre();
-            // Validamos si es hijo
-            if (hijos.get(i).getParent().equals(padre)) {
-                h.setName(hijos.get(i).getName());
-                h.setParent(hijos.get(i).getParent());
-                // verifico si tiene hijos
-                if (isPadre(h.getName(), hijos)) {
-                    // volvemos a llamar el metodo para obtener los hijos
-                    h.setChildren(this.getChildrens(h.getName(), hijos));
-                }
-                childrens.add(h);
+    private Nodo obtenerPadre(String nombrePadre, List<Nodo> nodos) {
+        for (Nodo nodo : nodos) {
+            if (nodo.getNodo().equals(nombrePadre)) {
+                return nodo;
             }
         }
-        return childrens;
-    }
-
-    /**
-     * Construye el arbol
-     *
-     * @param d datos para construir el arbol
-     * @param arbol el arbol a retornar
-     * @param p posicion del array de datos
-     * @return
-     */
-    public Padre arbol(String[] d, Padre arbol, int p) {
-        // condicion base
-        if (p == d.length) {
-            return arbol;
-        }
-        return arbol(d, arbol, p + 1);
+        return null;
     }
 
 }

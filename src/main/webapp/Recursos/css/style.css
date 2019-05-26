@@ -13,7 +13,9 @@
 }
 section {
     margin: 50px auto;
-    text-align: center;
+}
+.title{
+    color: #46b8da;
 }
 .resultado {
     width: 100%;
@@ -62,3 +64,22 @@ section {
     background: #181a1b;
     color: ghostwhite;
 }
+      .node {
+        cursor: pointer;
+      }
+
+      .node circle {
+        fill: #fff;
+        stroke: steelblue;
+        stroke-width: 3px;
+      }
+
+      .node text {
+        font: 12px sans-serif;
+      }
+
+      .link {
+        fill: none;
+        stroke: #ccc;
+        stroke-width: 2px;
+      }

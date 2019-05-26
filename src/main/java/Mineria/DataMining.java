@@ -52,9 +52,10 @@ public class DataMining implements Serializable {
                 case 3:
                     //Ejecuta el algoritmo RandomTree
                     resultado = raDataMining.RandomTree(data);
+                    break;
                 default:
             }
-            return encabezado(data) + "\n" + resultado;
+            return resultado;
         } catch (IOException ex) {
             return "El error es: " + ex.getMessage();
         }

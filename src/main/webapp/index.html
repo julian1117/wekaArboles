@@ -8,13 +8,12 @@
         <link href="Recursos/css/style.css" rel="stylesheet" type="text/css"/>
         <script src="Recursos/bootstrap-4.3.1-dist/js/bootstrap.js" type="text/javascript"></script>
         <script src="js/jquery-3.4.1.min.js" type="text/javascript"></script>
-        <script src="js/functions.js" type="text/javascript"></script>
     </head>
     <body>
 
 
         <section>
-            <div class="contenedor_prin" >
+            <div class="contenedor_prin" id="content">
                 <h1>Cargar archivo</h1>        
                 <form method="post" id="formulario" action="./servicios/servicios-Web/consumir"  enctype="multipart/form-data">
                     <label for="inputFile">Seleccionar archivo</label>
@@ -30,7 +29,10 @@
 
                     </div><br>
 
-                </form> 
+                </form>
+                <div class="">
+                    <div id="rtaArb"></div>
+                </div>
                 <div id="rta" class="resultado"><br></div>
             </div>
         </section>
@@ -47,9 +49,10 @@
                     </div>
                 </div>
             </center>        
-
         </footer>
 
     </body>
-
+    <script src="Recursos/Framework/D3/d3.v3.min.js" type="text/javascript"></script>
+    <script src="js/arbolD3.js" type="text/javascript"></script>
+    <script src="js/functions.js" type="text/javascript"></script>
 </html>
