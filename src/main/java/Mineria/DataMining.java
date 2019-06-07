@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.text.DecimalFormat;
+import weka.classifiers.trees.REPTree;
 import weka.core.Instances;
 
 /**
@@ -46,12 +47,12 @@ public class DataMining implements Serializable {
 
                 case 2:
                     // Ejecuta el algoritmo de randomforest
-                    resultado = raDataMining.RandomForest(data);
+                    resultado = raDataMining.arbolRandomTree(data);
                     break;
                     
                 case 3:
                     //Ejecuta el algoritmo RandomTree
-                    resultado = raDataMining.RandomTree(data);
+                    resultado = raDataMining.arbolREPTree(data);
                     break;
                 default:
             }

@@ -12,8 +12,11 @@ public class Nodo{
     private String nodo;
     private ArrayList<Nodo> children;
     
-    public Nodo(String nodo) {
+   /** public Nodo(String nodo) {
         this.nodo = nodo;
+    }*/
+
+    public Nodo() {
     }
 
     public String getName() {
